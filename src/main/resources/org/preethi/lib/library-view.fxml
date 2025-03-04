@@ -21,15 +21,31 @@
   </HBox>
 
   <!-- Table to Display Search Results -->
-  <TableView fx:id="booksTable" prefHeight="300" prefWidth="550">
+  <TableView fx:id="booksTable" prefHeight="300" prefWidth="850">
     <columns>
       <TableColumn text="ID" fx:id="idColumn" prefWidth="50"/>
-      <TableColumn text="Title" fx:id="titleColumn" prefWidth="150"/>
-      <TableColumn text="Author" fx:id="authorColumn" prefWidth="120"/>
-      <TableColumn text="Publication Date" fx:id="pubDateColumn" prefWidth="100"/>
-      <TableColumn text="Genre" fx:id="genreColumn" prefWidth="100"/>
-      <TableColumn text="Available" fx:id="availableColumn" prefWidth="80"/>
+      <TableColumn text="Semester" fx:id="semesterColumn" prefWidth="100"/>
+      <TableColumn text="Engg/MBA" fx:id="enggMbaColumn" prefWidth="100"/>
+      <TableColumn text="Year" fx:id="yearColumn" prefWidth="80"/>
+      <TableColumn text="Month" fx:id="monthColumn" prefWidth="80"/>
+      <TableColumn text="Date of Invoice" fx:id="dateOfInvoiceColumn" prefWidth="120"/>
+      <TableColumn text="Purchase Type" fx:id="purchaseTypeColumn" prefWidth="100"/>
+      <TableColumn text="Invoice No" fx:id="invoiceNoColumn" prefWidth="100"/>
+      <TableColumn text="Department" fx:id="departmentSubjectColumn" prefWidth="150"/>
+      <TableColumn text="Book Accn No (From)" fx:id="bookAccnNoFromColumn" prefWidth="100"/>
+      <TableColumn text="Book Accn No (To)" fx:id="bookAccnNoToColumn" prefWidth="100"/>
+      <TableColumn text="No. of Books" fx:id="noOfBooksColumn" prefWidth="80"/>
+      <TableColumn text="No. Purchased" fx:id="noOfBooksPurchasedColumn" prefWidth="100"/>
+      <TableColumn text="No. Donated" fx:id="noOfBooksDonatedColumn" prefWidth="100"/>
+      <TableColumn text="Acc Reg No" fx:id="accRegNoColumn" prefWidth="100"/>
+      <TableColumn text="Accn Reg Page (From)" fx:id="accnRegisterPageNoFromColumn" prefWidth="120"/>
+      <TableColumn text="Accn Reg Page (To)" fx:id="accnRegisterPageNoToColumn" prefWidth="120"/>
+      <TableColumn text="Discount (%)" fx:id="discountPercentageColumn" prefWidth="80"/>
+      <TableColumn text="Gross Invoice Amount" fx:id="grossInvoiceAmountColumn" prefWidth="120"/>
+      <TableColumn text="Discount Amount" fx:id="discountAmountColumn" prefWidth="120"/>
+      <TableColumn text="Net Amount" fx:id="netAmountColumn" prefWidth="120"/>
     </columns>
   </TableView>
+
 
 </VBox>

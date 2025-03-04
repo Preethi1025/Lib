@@ -2,13 +2,14 @@ package org.preethi.lib;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.sql.*;
 
@@ -21,32 +22,75 @@ public class LibraryController {
     @FXML
     private TableColumn<Book, Integer> idColumn;
     @FXML
-    private TableColumn<Book, String> titleColumn;
+    private TableColumn<Book, String> semesterColumn;
     @FXML
-    private TableColumn<Book, String> authorColumn;
+    private TableColumn<Book, String> enggMbaColumn;
     @FXML
-    private TableColumn<Book, String> pubDateColumn;
+    private TableColumn<Book, Integer> yearColumn;
     @FXML
-    private TableColumn<Book, String> genreColumn;
+    private TableColumn<Book, String> monthColumn;
     @FXML
-    private TableColumn<Book, Boolean> availableColumn;
+    private TableColumn<Book, String> dateOfInvoiceColumn;
+    @FXML
+    private TableColumn<Book, String> purchaseTypeColumn;
+    @FXML
+    private TableColumn<Book, String> invoiceNoColumn;
+    @FXML
+    private TableColumn<Book, String> departmentSubjectColumn;
+    @FXML
+    private TableColumn<Book, Integer> bookAccnNoFromColumn;
+    @FXML
+    private TableColumn<Book, Integer> bookAccnNoToColumn;
+    @FXML
+    private TableColumn<Book, Integer> noOfBooksColumn;
+    @FXML
+    private TableColumn<Book, Integer> noOfBooksPurchasedColumn;
+    @FXML
+    private TableColumn<Book, Integer> noOfBooksDonatedColumn;
+    @FXML
+    private TableColumn<Book, String> accRegNoColumn;
+    @FXML
+    private TableColumn<Book, Integer> accnRegisterPageNoFromColumn;
+    @FXML
+    private TableColumn<Book, Integer> accnRegisterPageNoToColumn;
+    @FXML
+    private TableColumn<Book, Double> discountPercentageColumn;
+    @FXML
+    private TableColumn<Book, Double> grossInvoiceAmountColumn;
+    @FXML
+    private TableColumn<Book, Double> discountAmountColumn;
+    @FXML
+    private TableColumn<Book, Double> netAmountColumn;
 
     private static final String URL = "jdbc:mysql://localhost:3306/library";
     private static final String USER = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "Preethi1002@";
 
     @FXML
     public void initialize() {
-        // Populate ComboBox with search criteria
-        searchCriteriaBox.setItems(FXCollections.observableArrayList("Book Title", "Author", "Publication Date", "Genre", "Publisher"));
+        searchCriteriaBox.setItems(FXCollections.observableArrayList("Semester", "Year", "Purchase Type", "Invoice No", "Department Subject"));
 
-        // Set up table columns
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-        authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
-        pubDateColumn.setCellValueFactory(new PropertyValueFactory<>("publicationDate"));
-        genreColumn.setCellValueFactory(new PropertyValueFactory<>("genre"));
-        availableColumn.setCellValueFactory(new PropertyValueFactory<>("available"));
+        semesterColumn.setCellValueFactory(new PropertyValueFactory<>("semester"));
+        enggMbaColumn.setCellValueFactory(new PropertyValueFactory<>("enggMba"));
+        yearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
+        monthColumn.setCellValueFactory(new PropertyValueFactory<>("month"));
+        dateOfInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("dateOfInvoice"));
+        purchaseTypeColumn.setCellValueFactory(new PropertyValueFactory<>("purchaseType"));
+        invoiceNoColumn.setCellValueFactory(new PropertyValueFactory<>("invoiceNo"));
+        departmentSubjectColumn.setCellValueFactory(new PropertyValueFactory<>("departmentSubject"));
+        bookAccnNoFromColumn.setCellValueFactory(new PropertyValueFactory<>("bookAccnNoFrom"));
+        bookAccnNoToColumn.setCellValueFactory(new PropertyValueFactory<>("bookAccnNoTo"));
+        noOfBooksColumn.setCellValueFactory(new PropertyValueFactory<>("noOfBooks"));
+        noOfBooksPurchasedColumn.setCellValueFactory(new PropertyValueFactory<>("noOfBooksPurchased"));
+        noOfBooksDonatedColumn.setCellValueFactory(new PropertyValueFactory<>("noOfBooksDonated"));
+        accRegNoColumn.setCellValueFactory(new PropertyValueFactory<>("accRegNo"));
+        accnRegisterPageNoFromColumn.setCellValueFactory(new PropertyValueFactory<>("accnRegisterPageNoFrom"));
+        accnRegisterPageNoToColumn.setCellValueFactory(new PropertyValueFactory<>("accnRegisterPageNoTo"));
+        discountPercentageColumn.setCellValueFactory(new PropertyValueFactory<>("discountPercentage"));
+        grossInvoiceAmountColumn.setCellValueFactory(new PropertyValueFactory<>("grossInvoiceAmount"));
+        discountAmountColumn.setCellValueFactory(new PropertyValueFactory<>("discountAmount"));
+        netAmountColumn.setCellValueFactory(new PropertyValueFactory<>("netAmount"));
     }
 
     @FXML
@@ -57,7 +101,6 @@ public class LibraryController {
             return;
         }
 
-        // Open a dialog box to get search input from the user
         TextInputDialog inputDialog = new TextInputDialog();
         inputDialog.setTitle("Search");
         inputDialog.setHeaderText("Enter " + selectedCriteria + " to search:");
@@ -67,16 +110,16 @@ public class LibraryController {
 
     private void fetchBooks(String criteria, String value) {
         String columnName = switch (criteria) {
-            case "Book Title" -> "title";
-            case "Author" -> "author";
-            case "Publication Date" -> "publication_date";
-            case "Genre" -> "genre";
-            case "Publisher" -> "publisher";
+            case "Semester" -> "semester";
+            case "Year" -> "year";
+            case "Purchase Type" -> "purchase_type";
+            case "Invoice No" -> "invoice_no";
+            case "Department Subject" -> "department_subject";
             default -> throw new IllegalArgumentException("Invalid search criteria");
         };
 
         ObservableList<Book> booksList = FXCollections.observableArrayList();
-        String query = "SELECT * FROM books WHERE " + columnName + " LIKE ?";
+        String query = "SELECT * FROM book WHERE " + columnName + " LIKE ?";
 
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -87,11 +130,26 @@ public class LibraryController {
             while (resultSet.next()) {
                 booksList.add(new Book(
                         resultSet.getInt("id"),
-                        resultSet.getString("title"),
-                        resultSet.getString("author"),
-                        resultSet.getString("publication_date"),
-                        resultSet.getString("genre"),
-                        resultSet.getBoolean("available")
+                        resultSet.getString("semester"),
+                        resultSet.getString("engg_mba"),
+                        resultSet.getInt("year"),
+                        resultSet.getString("month"),
+                        resultSet.getString("date_of_invoice"),
+                        resultSet.getString("purchase_type"),
+                        resultSet.getString("invoice_no"),
+                        resultSet.getString("department_subject"),
+                        resultSet.getInt("book_accn_no_from"),
+                        resultSet.getInt("book_accn_no_to"),
+                        resultSet.getInt("no_of_books"),
+                        resultSet.getInt("no_of_books_purchased"),
+                        resultSet.getInt("no_of_books_donated"),
+                        resultSet.getString("acc_reg_no"),
+                        resultSet.getInt("accn_register_page_no_from"),
+                        resultSet.getInt("accn_register_page_no_to"),
+                        resultSet.getDouble("discount_percentage"),
+                        resultSet.getDouble("gross_invoice_amount"),
+                        resultSet.getDouble("discount_amount"),
+                        resultSet.getDouble("net_amount")
                 ));
             }
 
@@ -101,24 +159,30 @@ public class LibraryController {
         }
     }
 
+    @FXML
+    private void openNewForm() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/preethi/lib/new-book-form.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace(); // Print full error details in the console
+            showError("Error opening form: " + e.getMessage());
+        }
+    }
+
+    private void showError(String s) {
+    }
+
+
     private void showAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Information");
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
-    @FXML
-    private void openNewForm() {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/org/preethi/lib/new-book-form.fxml"));
-            Stage stage = new Stage();
-            Scene scene = new Scene(fxmlLoader.load(), 400, 400);
-            stage.setTitle("Add New Book");
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 }
