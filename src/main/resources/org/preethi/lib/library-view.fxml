@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.Label?>
+
+<VBox spacing="20" alignment="CENTER" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml" fx:controller="org.preethi.lib.LibraryController">
+
+  <Label text="Saranathan College of Engineering" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+  <Label text="Autonomous Institution" style="-fx-font-size: 16px; -fx-font-style: italic;"/>
+
+  <HBox spacing="10" alignment="CENTER">
+    <ComboBox fx:id="searchCriteriaBox" promptText="Select Search Criteria"/>
+    <Button text="Search" onAction="#handleSearch"/>
+    <Button text="Upload"/>
+    <Button text="New" onAction="#openNewForm"/>
+  </HBox>
+
+  <!-- Table to Display Search Results -->
+  <TableView fx:id="booksTable" prefHeight="300" prefWidth="550">
+    <columns>
+      <TableColumn text="ID" fx:id="idColumn" prefWidth="50"/>
+      <TableColumn text="Title" fx:id="titleColumn" prefWidth="150"/>
+      <TableColumn text="Author" fx:id="authorColumn" prefWidth="120"/>
+      <TableColumn text="Publication Date" fx:id="pubDateColumn" prefWidth="100"/>
+      <TableColumn text="Genre" fx:id="genreColumn" prefWidth="100"/>
+      <TableColumn text="Available" fx:id="availableColumn" prefWidth="80"/>
+    </columns>
+  </TableView>
+
+</VBox>

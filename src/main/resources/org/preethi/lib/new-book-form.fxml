@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox spacing="10" alignment="CENTER" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml" fx:controller="org.preethi.lib.NewBookController">
+
+    <Label text="Enter Book Details" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+    <GridPane hgap="10" vgap="10">
+        <Label text="Title:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <TextField fx:id="titleField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+        <Label text="Author:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <TextField fx:id="authorField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+        <Label text="Publication Date:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+        <DatePicker fx:id="publicationDateField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+        <Label text="Genre:" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+        <TextField fx:id="genreField" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+        <Label text="Available:" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+        <CheckBox fx:id="availableCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+    </GridPane>
+
+    <Button text="Save Book" onAction="#saveBook"/>
+</VBox>
