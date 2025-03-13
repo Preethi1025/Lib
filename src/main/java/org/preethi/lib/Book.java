@@ -9,6 +9,7 @@ public class Book {
     private String dateOfInvoice;
     private String purchaseType;
     private String invoiceNo;
+    private String nameOfTheBookSupplier; // New field
     private String departmentSubject;
     private int bookAccnNoFrom;
     private int bookAccnNoTo;
@@ -19,16 +20,16 @@ public class Book {
     private int accnRegisterPageNoFrom;
     private int accnRegisterPageNoTo;
     private double discountPercentage;
-    private double grossInvoiceAmount;
+    private int grossInvoiceAmount;
     private double discountAmount;
-    private double netAmount;
+    private int netAmount;
 
-    // Constructor
+    // Updated Constructor
     public Book(int id, String semester, String enggMba, int year, String month, String dateOfInvoice,
-                String purchaseType, String invoiceNo, String departmentSubject, int bookAccnNoFrom, int bookAccnNoTo,
+                String purchaseType, String invoiceNo, String nameOfTheBookSupplier, String departmentSubject, int bookAccnNoFrom, int bookAccnNoTo,
                 int noOfBooks, int noOfBooksPurchased, int noOfBooksDonated, String accRegNo, int accnRegisterPageNoFrom,
-                int accnRegisterPageNoTo, double discountPercentage, double grossInvoiceAmount,
-                double discountAmount, double netAmount) {
+                int accnRegisterPageNoTo, double discountPercentage, int grossInvoiceAmount,
+                double discountAmount, int netAmount) {
         this.id = id;
         this.semester = semester;
         this.enggMba = enggMba;
@@ -37,6 +38,7 @@ public class Book {
         this.dateOfInvoice = dateOfInvoice;
         this.purchaseType = purchaseType;
         this.invoiceNo = invoiceNo;
+        this.nameOfTheBookSupplier = nameOfTheBookSupplier; // Set new field
         this.departmentSubject = departmentSubject;
         this.bookAccnNoFrom = bookAccnNoFrom;
         this.bookAccnNoTo = bookAccnNoTo;
@@ -51,8 +53,6 @@ public class Book {
         this.discountAmount = discountAmount;
         this.netAmount = netAmount;
     }
-
-    // Getters
     public int getId() { return id; }
     public String getSemester() { return semester; }
     public String getEnggMba() { return enggMba; }
@@ -61,6 +61,7 @@ public class Book {
     public String getDateOfInvoice() { return dateOfInvoice; }
     public String getPurchaseType() { return purchaseType; }
     public String getInvoiceNo() { return invoiceNo; }
+    public String getNameOfTheBookSupplier() { return nameOfTheBookSupplier; }
     public String getDepartmentSubject() { return departmentSubject; }
     public int getBookAccnNoFrom() { return bookAccnNoFrom; }
     public int getBookAccnNoTo() { return bookAccnNoTo; }
@@ -84,6 +85,7 @@ public class Book {
     public void setDateOfInvoice(String dateOfInvoice) { this.dateOfInvoice = dateOfInvoice; }
     public void setPurchaseType(String purchaseType) { this.purchaseType = purchaseType; }
     public void setInvoiceNo(String invoiceNo) { this.invoiceNo = invoiceNo; }
+    public void setNameOfTheBookSupplier(String nameOfTheBookSupplier) { this.nameOfTheBookSupplier = nameOfTheBookSupplier; }
     public void setDepartmentSubject(String departmentSubject) { this.departmentSubject = departmentSubject; }
     public void setBookAccnNoFrom(int bookAccnNoFrom) { this.bookAccnNoFrom = bookAccnNoFrom; }
     public void setBookAccnNoTo(int bookAccnNoTo) { this.bookAccnNoTo = bookAccnNoTo; }
@@ -94,9 +96,9 @@ public class Book {
     public void setAccnRegisterPageNoFrom(int accnRegisterPageNoFrom) { this.accnRegisterPageNoFrom = accnRegisterPageNoFrom; }
     public void setAccnRegisterPageNoTo(int accnRegisterPageNoTo) { this.accnRegisterPageNoTo = accnRegisterPageNoTo; }
     public void setDiscountPercentage(double discountPercentage) { this.discountPercentage = discountPercentage; }
-    public void setGrossInvoiceAmount(double grossInvoiceAmount) { this.grossInvoiceAmount = grossInvoiceAmount; }
-    public void setDiscountAmount(double discountAmount) { this.discountAmount = discountAmount; }
-    public void setNetAmount(double netAmount) { this.netAmount = netAmount; }
+    public void setGrossInvoiceAmount(int grossInvoiceAmount) { this.grossInvoiceAmount = grossInvoiceAmount; }
+    public void setDiscountAmount(int discountAmount) { this.discountAmount = discountAmount; }
+    public void setNetAmount(int netAmount) { this.netAmount = netAmount; }
 
     // toString method
     @Override

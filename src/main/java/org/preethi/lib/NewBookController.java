@@ -1,11 +1,17 @@
-// Updated NewBookController.java
-
 package org.preethi.lib;
 
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -23,6 +29,7 @@ public class NewBookController {
     @FXML private DatePicker dateOfInvoiceField;
     @FXML private TextField purchaseTypeField;
     @FXML private TextField invoiceNoField;
+    @FXML private TextField nameOfTheBookSupplierField;
     @FXML private TextField departmentSubjectField;
     @FXML private TextField bookAccnNoFromField;
     @FXML private TextField bookAccnNoToField;
@@ -36,51 +43,69 @@ public class NewBookController {
     @FXML private TextField grossInvoiceAmountField;
     @FXML private TextField discountAmountField;
     @FXML private TextField netAmountField;
+    @FXML private Button saveButton;
 
     private static final String URL = "jdbc:mysql://localhost:3306/library";
     private static final String USER = "root";
     private static final String PASSWORD = "Preethi1002@";
+//
+//    public NewBookController(TextField nameOfTheBookField) {
+//        name_of_the_bookField = nameOfTheBookField;
+//    }
 
     @FXML
-    private void saveBook() {
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(
-                     "INSERT INTO book (id, semester, engg_mba, year, month, date_of_invoice, purchase_type, invoice_no, department_subject, " +
-                             "book_accn_no_from, book_accn_no_to, no_of_books, no_of_books_purchased, no_of_books_donated, acc_reg_no, " +
-                             "accn_register_page_no_from, accn_register_page_no_to, discount_percentage, gross_invoice_amount, " +
-                             "discount_amount, net_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
-
-            statement.setInt(1, Integer.parseInt(idField.getText()));
-            statement.setString(2, semesterField.getText());
-            statement.setString(3, enggMbaField.getText());
-            statement.setString(4, yearField.getText());
-            statement.setString(5, monthField.getText());
-            statement.setString(6, dateOfInvoiceField.getValue().toString());
-            statement.setString(7, purchaseTypeField.getText());
-            statement.setString(8, invoiceNoField.getText());
-            statement.setString(9, departmentSubjectField.getText());
-            statement.setString(10, bookAccnNoFromField.getText());
-            statement.setString(11, bookAccnNoToField.getText());
-            statement.setInt(12, Integer.parseInt(noOfBooksField.getText()));
-            statement.setInt(13, Integer.parseInt(noOfBooksPurchasedField.getText()));
-            statement.setInt(14, Integer.parseInt(noOfBooksDonatedField.getText()));
-            statement.setString(15, accRegNoField.getText());
-            statement.setString(16, accnRegisterPageNoFromField.getText());
-            statement.setString(17, accnRegisterPageNoToField.getText());
-            statement.setDouble(18, Double.parseDouble(discountPercentageField.getText()));
-            statement.setDouble(19, Double.parseDouble(grossInvoiceAmountField.getText()));
-            statement.setDouble(20, Double.parseDouble(discountAmountField.getText()));
-            statement.setDouble(21, Double.parseDouble(netAmountField.getText()));
-
-            statement.executeUpdate();
-            showAlert("Record added successfully!");
-            clearFields();
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Error saving record!");
+    private void handleEnter(KeyEvent event) {
+        Node source = (Node) event.getSource(); // Get the current field
+        if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.DOWN) {
+            // Move to the next field
+            source.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.TAB, false, false, false, false));
+        } else if (event.getCode() == KeyCode.UP) {
+            // Move to the previous field
+            source.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.TAB, true, false, false, false));
         }
     }
 
+
+        @FXML
+        private void saveBook() {
+            try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                 PreparedStatement statement = connection.prepareStatement(
+                         "INSERT INTO 2023_2024_data(id, semester, engg_mba, year, month, date_of_invoice, purchase_type, invoice_no, name_of_the_book_supplier, department_subject, " +
+                                 "book_accn_no_from, book_accn_no_to, no_of_books, no_of_books_purchased, no_of_books_donated, acc_reg_no, " +
+                                 "accn_register_page_no_from, accn_register_page_no_to, discount_percentage, gross_invoice_amount, " +
+                                 "discount_amount, net_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+
+                statement.setInt(1, Integer.parseInt(idField.getText()));
+                statement.setString(2, semesterField.getText());
+                statement.setString(3, enggMbaField.getText());
+                statement.setInt(4, Integer.parseInt(yearField.getText()));
+                statement.setInt(5, Integer.parseInt(monthField.getText()));
+                statement.setString(6, dateOfInvoiceField.getValue().toString());
+                statement.setString(7, purchaseTypeField.getText());
+                statement.setString(8, invoiceNoField.getText());
+                statement.setString(9, nameOfTheBookSupplierField.getText()); // New Field
+                statement.setString(10, departmentSubjectField.getText());
+                statement.setInt(11, Integer.parseInt(bookAccnNoFromField.getText()));
+                statement.setInt(12, Integer.parseInt(bookAccnNoToField.getText()));
+                statement.setInt(13, Integer.parseInt(noOfBooksField.getText()));
+                statement.setInt(14, Integer.parseInt(noOfBooksPurchasedField.getText()));
+                statement.setInt(15, Integer.parseInt(noOfBooksDonatedField.getText()));
+                statement.setString(16, accRegNoField.getText());
+                statement.setInt(17, Integer.parseInt(accnRegisterPageNoFromField.getText()));
+                statement.setInt(18, Integer.parseInt(accnRegisterPageNoToField.getText()));
+                statement.setDouble(19, Double.parseDouble(discountPercentageField.getText()));
+                statement.setInt(20, Integer.parseInt(grossInvoiceAmountField.getText()));
+                statement.setDouble(21, Double.parseDouble(discountAmountField.getText()));
+                statement.setInt(22, Integer.parseInt(netAmountField.getText()));
+
+                statement.executeUpdate();
+                showAlert("Record added successfully!");
+                clearFields();
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Error saving record: " + e.getMessage());
+            }
+        }
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Library Management");
@@ -111,18 +136,5 @@ public class NewBookController {
         grossInvoiceAmountField.clear();
         discountAmountField.clear();
         netAmountField.clear();
-    }
-    @FXML
-    private void openNewForm() {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/org/preethi/lib/new-book-form.fxml"));
-            Stage stage = new Stage();
-            Scene scene = new Scene(fxmlLoader.load(), 400, 400);
-            stage.setTitle("Add New Book");
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

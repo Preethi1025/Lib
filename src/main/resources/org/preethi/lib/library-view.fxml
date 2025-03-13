@@ -16,7 +16,7 @@
   <HBox spacing="10" alignment="CENTER">
     <ComboBox fx:id="searchCriteriaBox" promptText="Select Search Criteria"/>
     <Button text="Search" onAction="#handleSearch"/>
-    <Button text="Upload"/>
+    <Button text="GenerateReport"/>
     <Button text="New" onAction="#openNewForm"/>
   </HBox>
 
@@ -31,6 +31,10 @@
       <TableColumn text="Date of Invoice" fx:id="dateOfInvoiceColumn" prefWidth="120"/>
       <TableColumn text="Purchase Type" fx:id="purchaseTypeColumn" prefWidth="100"/>
       <TableColumn text="Invoice No" fx:id="invoiceNoColumn" prefWidth="100"/>
+
+      <!-- ✅ New Column for Book Supplier Name -->
+      <TableColumn text="Book Supplier Name" fx:id="nameOfTheBookSupplierColumn" prefWidth="150"/>
+
       <TableColumn text="Department" fx:id="departmentSubjectColumn" prefWidth="150"/>
       <TableColumn text="Book Accn No (From)" fx:id="bookAccnNoFromColumn" prefWidth="100"/>
       <TableColumn text="Book Accn No (To)" fx:id="bookAccnNoToColumn" prefWidth="100"/>
@@ -46,6 +50,4 @@
       <TableColumn text="Net Amount" fx:id="netAmountColumn" prefWidth="120"/>
     </columns>
   </TableView>
-
-
 </VBox>

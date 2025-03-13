@@ -28,13 +28,15 @@ public class LibraryController {
     @FXML
     private TableColumn<Book, Integer> yearColumn;
     @FXML
-    private TableColumn<Book, String> monthColumn;
+    private TableColumn<Book, Integer> monthColumn;
     @FXML
     private TableColumn<Book, String> dateOfInvoiceColumn;
     @FXML
     private TableColumn<Book, String> purchaseTypeColumn;
     @FXML
     private TableColumn<Book, String> invoiceNoColumn;
+    @FXML
+    private TableColumn<Book, String> nameOfTheBookSupplierColumn; // New Column
     @FXML
     private TableColumn<Book, String> departmentSubjectColumn;
     @FXML
@@ -56,11 +58,11 @@ public class LibraryController {
     @FXML
     private TableColumn<Book, Double> discountPercentageColumn;
     @FXML
-    private TableColumn<Book, Double> grossInvoiceAmountColumn;
+    private TableColumn<Book, Integer> grossInvoiceAmountColumn;
     @FXML
     private TableColumn<Book, Double> discountAmountColumn;
     @FXML
-    private TableColumn<Book, Double> netAmountColumn;
+    private TableColumn<Book, Integer> netAmountColumn;
 
     private static final String URL = "jdbc:mysql://localhost:3306/library";
     private static final String USER = "root";
@@ -68,7 +70,9 @@ public class LibraryController {
 
     @FXML
     public void initialize() {
-        searchCriteriaBox.setItems(FXCollections.observableArrayList("Semester", "Year", "Purchase Type", "Invoice No", "Department Subject"));
+        searchCriteriaBox.setItems(FXCollections.observableArrayList(
+                "Semester", "Year", "Purchase Type", "Invoice No", "Department Subject"
+        ));
 
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         semesterColumn.setCellValueFactory(new PropertyValueFactory<>("semester"));
@@ -78,6 +82,7 @@ public class LibraryController {
         dateOfInvoiceColumn.setCellValueFactory(new PropertyValueFactory<>("dateOfInvoice"));
         purchaseTypeColumn.setCellValueFactory(new PropertyValueFactory<>("purchaseType"));
         invoiceNoColumn.setCellValueFactory(new PropertyValueFactory<>("invoiceNo"));
+        nameOfTheBookSupplierColumn.setCellValueFactory(new PropertyValueFactory<>("nameOfTheBookSupplier")); // New Column
         departmentSubjectColumn.setCellValueFactory(new PropertyValueFactory<>("departmentSubject"));
         bookAccnNoFromColumn.setCellValueFactory(new PropertyValueFactory<>("bookAccnNoFrom"));
         bookAccnNoToColumn.setCellValueFactory(new PropertyValueFactory<>("bookAccnNoTo"));
@@ -119,7 +124,7 @@ public class LibraryController {
         };
 
         ObservableList<Book> booksList = FXCollections.observableArrayList();
-        String query = "SELECT * FROM book WHERE " + columnName + " LIKE ?";
+        String query = "SELECT * FROM 2023_2024_data WHERE " + columnName + " LIKE ?";
 
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -137,6 +142,7 @@ public class LibraryController {
                         resultSet.getString("date_of_invoice"),
                         resultSet.getString("purchase_type"),
                         resultSet.getString("invoice_no"),
+                        resultSet.getString("name_of_the_book_supplier"), // New Field
                         resultSet.getString("department_subject"),
                         resultSet.getInt("book_accn_no_from"),
                         resultSet.getInt("book_accn_no_to"),
@@ -147,9 +153,9 @@ public class LibraryController {
                         resultSet.getInt("accn_register_page_no_from"),
                         resultSet.getInt("accn_register_page_no_to"),
                         resultSet.getDouble("discount_percentage"),
-                        resultSet.getDouble("gross_invoice_amount"),
+                        resultSet.getInt("gross_invoice_amount"),
                         resultSet.getDouble("discount_amount"),
-                        resultSet.getDouble("net_amount")
+                        resultSet.getInt("net_amount")
                 ));
             }
 
@@ -173,16 +179,19 @@ public class LibraryController {
         }
     }
 
-    private void showError(String s) {
-    }
-
-
-    private void showAlert(String message) {
+    private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
+        alert.setTitle("Library Management");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }
 
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Library Management");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }
