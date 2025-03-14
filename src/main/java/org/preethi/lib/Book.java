@@ -1,4 +1,5 @@
 package org.preethi.lib;
+import javafx.beans.property.*;
 
 public class Book {
     private int id;
@@ -23,6 +24,17 @@ public class Book {
     private int grossInvoiceAmount;
     private double discountAmount;
     private int netAmount;
+
+//    private final IntegerProperty no;
+//    private final IntegerProperty accNo;
+//    private final StringProperty title;
+//    private final StringProperty author;
+//    private final StringProperty publisher;
+//    private final DoubleProperty classNo;
+//    private final StringProperty volume;
+//    private final StringProperty library;
+//    private final StringProperty status;
+//    private final StringProperty myUnknownColumn;
 
     // Updated Constructor
     public Book(int id, String semester, String enggMba, int year, String month, String dateOfInvoice,
@@ -127,4 +139,7 @@ public class Book {
                 ", netAmount=" + netAmount +
                 '}';
     }
+
+
+
 }

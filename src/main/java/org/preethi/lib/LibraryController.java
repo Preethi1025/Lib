@@ -8,10 +8,22 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import javafx.scene.chart.PieChart;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.layout.VBox;
+import java.util.*;
 
 public class LibraryController {
 
@@ -64,6 +76,7 @@ public class LibraryController {
     @FXML
     private TableColumn<Book, Integer> netAmountColumn;
 
+
     private static final String URL = "jdbc:mysql://localhost:3306/library";
     private static final String USER = "root";
     private static final String PASSWORD = "Preethi1002@";
@@ -71,7 +84,7 @@ public class LibraryController {
     @FXML
     public void initialize() {
         searchCriteriaBox.setItems(FXCollections.observableArrayList(
-                "Semester", "Year", "Purchase Type", "Invoice No", "Department Subject"
+                "Semester", "Year", "Purchase Type", "Invoice No","Book Supplier Name", "Department Subject"
         ));
 
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -96,6 +109,188 @@ public class LibraryController {
         grossInvoiceAmountColumn.setCellValueFactory(new PropertyValueFactory<>("grossInvoiceAmount"));
         discountAmountColumn.setCellValueFactory(new PropertyValueFactory<>("discountAmount"));
         netAmountColumn.setCellValueFactory(new PropertyValueFactory<>("netAmount"));
+        statementButton.setOnAction(event -> showStatement());
+
+    }
+//    @FXML private TableView<Book> booksTable;
+// Reference to TableView
+@FXML
+private TableView<BookData> mainTable;  // This is the main book table in your UI
+
+    @FXML
+    private Button statementButton;
+
+//    public void initialize() {
+//        statementButton.setOnAction(event -> showStatement());
+//    }
+
+    private void showStatement() {
+        Stage statementStage = new Stage();
+        statementStage.setTitle("Library Book Statement");
+
+        TableView<BookData> table = new TableView<>();
+
+        // Define table columns
+        TableColumn<BookData, String> categoryCol = new TableColumn<>("Category");
+        categoryCol.setCellValueFactory(new PropertyValueFactory<>("category"));
+
+        TableColumn<BookData, Integer> booksCol = new TableColumn<>("No of Books");
+        booksCol.setCellValueFactory(new PropertyValueFactory<>("books"));
+
+        TableColumn<BookData, Integer> specimensCol = new TableColumn<>("Specimens");
+        specimensCol.setCellValueFactory(new PropertyValueFactory<>("specimens"));
+
+        TableColumn<BookData, Integer> purchasedCol = new TableColumn<>("Purchased");
+        purchasedCol.setCellValueFactory(new PropertyValueFactory<>("purchased"));
+
+        TableColumn<BookData, Integer> totalBooksCol = new TableColumn<>("Total Books");
+        totalBooksCol.setCellValueFactory(new PropertyValueFactory<>("totalBooks"));
+
+        TableColumn<BookData, Double> amountCol = new TableColumn<>("Total Amount");
+        amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
+
+        table.getColumns().addAll(categoryCol, booksCol, specimensCol, purchasedCol, totalBooksCol, amountCol);
+
+        // Load data into table
+        ObservableList<BookData> data = FXCollections.observableArrayList(
+                new BookData("ENGINEERING", 457, 224, 233, 457, 307197),
+                new BookData("MBA", 105, 105, 0, 105, 0),
+                new BookData("Total", 562, 329, 233, 562, 307197)
+        );
+
+        table.setItems(data);
+
+        VBox vbox = new VBox(table);
+        Scene scene = new Scene(vbox, 800, 400);
+        statementStage.setScene(scene);
+        statementStage.show();
+    }
+
+    // Model Class for BookData
+    public static class BookData {
+        private final String category;
+        private final int books;
+        private final int specimens;
+        private final int purchased;
+        private final int totalBooks;
+        private final double amount;
+
+        public BookData(String category, int books, int specimens, int purchased, int totalBooks, double amount) {
+            this.category = category;
+            this.books = books;
+            this.specimens = specimens;
+            this.purchased = purchased;
+            this.totalBooks = totalBooks;
+            this.amount = amount;
+        }
+
+        public String getCategory() { return category; }
+        public int getBooks() { return books; }
+        public int getSpecimens() { return specimens; }
+        public int getPurchased() { return purchased; }
+        public int getTotalBooks() { return totalBooks; }
+        public double getAmount() { return amount; }
+    }
+    @FXML
+    private void handleGenerateReport() {
+        // Create a new stage (popup window)
+        Stage chartStage = new Stage();
+        chartStage.setTitle("Books Data Visualization");
+
+        // Create PieChart and BarChart
+        PieChart pieChart = createPieChart();
+        BarChart<String, Number> barChart = createBarChart();
+
+        // Add charts to VBox
+        VBox vbox = new VBox(20, pieChart, barChart);
+        Scene scene = new Scene(vbox, 800, 600);
+
+        chartStage.setScene(scene);
+        chartStage.show();
+    }
+
+    private PieChart createPieChart() {
+        PieChart pieChart = new PieChart();
+        pieChart.setTitle("Books by Department");
+
+        // Get data from TableView
+        ObservableList<Book> bookList = booksTable.getItems();
+
+        // Count books per department
+        Map<String, Integer> departmentCount = new HashMap<>();
+        for (Book book : bookList) {
+            departmentCount.put(book.getDepartmentSubject(),
+                    departmentCount.getOrDefault(book.getDepartmentSubject(), 0) + 1);
+        }
+
+        // Add data to PieChart with tooltip
+        for (Map.Entry<String, Integer> entry : departmentCount.entrySet()) {
+            PieChart.Data slice = new PieChart.Data(entry.getKey(), entry.getValue());
+            pieChart.getData().add(slice);
+
+            // Create tooltip
+            Tooltip tooltip = new Tooltip(entry.getKey() + ": " + entry.getValue() + " books");
+            Tooltip.install(slice.getNode(), tooltip);
+
+            // Update tooltip dynamically when data changes
+            slice.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                if (newNode != null) {
+                    Tooltip.install(newNode, tooltip);
+                }
+            });
+        }
+
+        return pieChart;
+    }
+
+    private BarChart<String, Number> createBarChart() {
+        // Create axes
+        CategoryAxis xAxis = new CategoryAxis();
+        xAxis.setLabel("Department");
+
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("No. of Books");
+
+        // Create BarChart
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("Books by Department");
+
+        // Create Series
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Books Count");
+
+        // Get data from TableView
+        ObservableList<Book> bookList = booksTable.getItems();
+
+        // Count books per department
+        Map<String, Integer> departmentCount = new HashMap<>();
+        for (Book book : bookList) {
+            departmentCount.put(book.getDepartmentSubject(),
+                    departmentCount.getOrDefault(book.getDepartmentSubject(), 0) + 1);
+        }
+
+        // Add data to BarChart with tooltip
+        for (Map.Entry<String, Integer> entry : departmentCount.entrySet()) {
+            XYChart.Data<String, Number> dataPoint = new XYChart.Data<>(entry.getKey(), entry.getValue());
+            series.getData().add(dataPoint);
+
+            // Create tooltip
+            Tooltip tooltip = new Tooltip(entry.getKey() + ": " + entry.getValue() + " books");
+
+            // Add tooltip when hovering over bars
+            dataPoint.nodeProperty().addListener((obs, oldNode, newNode) -> {
+                if (newNode != null) {
+                    Tooltip.install(newNode, tooltip);
+
+                    // Highlight bar on hover
+                    newNode.setOnMouseEntered(e -> newNode.setStyle("-fx-opacity: 0.7;"));
+                    newNode.setOnMouseExited(e -> newNode.setStyle("-fx-opacity: 1;"));
+                }
+            });
+        }
+
+        barChart.getData().add(series);
+        return barChart;
     }
 
     @FXML
@@ -119,6 +314,7 @@ public class LibraryController {
             case "Year" -> "year";
             case "Purchase Type" -> "purchase_type";
             case "Invoice No" -> "invoice_no";
+            case "Book Supplier Name" -> "name_of_the_book_supplier";
             case "Department Subject" -> "department_subject";
             default -> throw new IllegalArgumentException("Invalid search criteria");
         };
@@ -194,4 +390,32 @@ public class LibraryController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+
+    @FXML
+    private void openHtmlPage() {
+        try {
+            // Specify the path to your generated HTML file
+            File htmlFile = new File("C:\\Users\\preet\\Downloads\\Lib1\\Lib1\\src\\main\\resources\\org\\preethi\\lib\\list_of_books.html"); // Change this path to match your HTML file location
+
+            // Check if Desktop is supported
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().browse(htmlFile.toURI()); // Open in default web browser
+            } else {
+                showAlerts("Desktop browsing is not supported on this system.");
+            }
+        } catch (IOException e) {
+            showAlerts("Error opening the HTML file: " + e.getMessage());
+        }
+    }
+
+    // Utility function to show alerts
+    private void showAlerts(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 }

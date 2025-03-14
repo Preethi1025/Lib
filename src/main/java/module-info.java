@@ -2,6 +2,7 @@ module org.preethi.lib {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;
+    requires java.desktop;
 
 
     opens org.preethi.lib to javafx.fxml;

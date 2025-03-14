@@ -7,8 +7,11 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.Label?>
 
+
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
 <VBox spacing="20" alignment="CENTER" xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml" fx:controller="org.preethi.lib.LibraryController">
+      xmlns:fx="http://javafx.com/fxml" fx:controller="org.preethi.lib.LibraryController" fx:id="rootPane">
 
   <Label text="Saranathan College of Engineering" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
   <Label text="Autonomous Institution" style="-fx-font-size: 16px; -fx-font-style: italic;"/>
@@ -16,7 +19,24 @@
   <HBox spacing="10" alignment="CENTER">
     <ComboBox fx:id="searchCriteriaBox" promptText="Select Search Criteria"/>
     <Button text="Search" onAction="#handleSearch"/>
-    <Button text="GenerateReport"/>
+
+    <Button fx:id="statementButton" text="Show Statement" />
+<!--    <ComboBox fx:id="dropdownComboBox" promptText="Select Option">-->
+<!--      <items>-->
+<!--        <FXCollections fx:factory="observableArrayList">-->
+<!--          <String fx:value="Amazon Books"/>-->
+<!--          <String fx:value="List of Books (June - May)"/>-->
+<!--          <String fx:value="Purchase"/>-->
+<!--          <String fx:value="Visualization"/>-->
+<!--        </FXCollections>-->
+<!--      </items>-->
+<!--    </ComboBox>-->
+    <Button text="GenerateReport" onAction="#handleGenerateReport"/>
+
+    <Button text="List of Books (May - June 2024)" onAction="#openHtmlPage"/>
+
+
+
     <Button text="New" onAction="#openNewForm"/>
   </HBox>
 
