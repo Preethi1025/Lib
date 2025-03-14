@@ -8,12 +8,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
@@ -109,20 +108,21 @@ public class LibraryController {
         grossInvoiceAmountColumn.setCellValueFactory(new PropertyValueFactory<>("grossInvoiceAmount"));
         discountAmountColumn.setCellValueFactory(new PropertyValueFactory<>("discountAmount"));
         netAmountColumn.setCellValueFactory(new PropertyValueFactory<>("netAmount"));
-        statementButton.setOnAction(event -> showStatement());
+        //statementButton.setOnAction(event -> showStatement());
 
     }
-//    @FXML private TableView<Book> booksTable;
+    //    @FXML private TableView<Book> booksTable;
 // Reference to TableView
-@FXML
-private TableView<BookData> mainTable;  // This is the main book table in your UI
+    @FXML
+    private MenuButton statementButton;
 
     @FXML
-    private Button statementButton;
+    private MenuButton statementMenuButton;
+    @FXML
+    private TableView<BookData> mainTable;  // This is the main book table in your UI
 
-//    public void initialize() {
-//        statementButton.setOnAction(event -> showStatement());
-//    }
+
+
 
     private void showStatement() {
         Stage statementStage = new Stage();
@@ -418,4 +418,71 @@ private TableView<BookData> mainTable;  // This is the main book table in your U
         alert.showAndWait();
     }
 
+    @FXML
+    private MenuItem year2023, year2024, purchasedOption, donationOption;
+
+    @FXML
+    private void handleYearSelection(ActionEvent event) {
+        MenuItem selected = (MenuItem) event.getSource();
+        String year = selected.getText();
+        fetchBook("Year", year);
+    }
+
+    @FXML
+    private void handlePurchaseSelection() {
+        fetchBook("Purchase Type", "purchase");
+    }
+
+    @FXML
+    private void handleDonationSelection() {
+        fetchBook("Purchase Type", "donation");
+    }
+
+    private void fetchBook(String criteria, String value) {
+        String columnName = switch (criteria) {
+            case "Year" -> "year";
+            case "Purchase Type" -> "purchase_type";
+            default -> throw new IllegalArgumentException("Invalid criteria");
+        };
+
+        ObservableList<BookSummary> summaryList = FXCollections.observableArrayList();
+        String query = "SELECT year, no_of_books, no_of_books_donated AS specimens, no_of_books_purchased AS purchased, (no_of_books_purchased + no_of_books_donated) AS total_books, net_amount AS total_amount FROM 2023_2024_data WHERE " + columnName + " = ?";
+
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, value);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                summaryList.add(new BookSummary(
+                        resultSet.getInt("year"),
+                        resultSet.getInt("no_of_books"),
+                        resultSet.getInt("specimens"),
+                        resultSet.getInt("purchased"),
+                        resultSet.getInt("total_books"),
+                        resultSet.getInt("total_amount")
+                ));
+            }
+
+            // Open new window and show data
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/preethi/lib/book_summary.fxml"));
+            Parent root = loader.load();
+
+            BookSummaryController summaryController = loader.getController();
+            summaryController.setSummaryData(summaryList);
+
+            Stage stage = new Stage();
+            stage.setTitle("Summary Report");
+            stage.setScene(new Scene(root));
+            stage.show();
+
+        } catch (Exception e) {
+            showAlert("Error fetching records: " + e.getMessage());
+        }
+    }
+
+
 }
+
+
