@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/8.0"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.preethi.lib.BookSummaryController">
+
+    <TableView fx:id="summaryTable" prefWidth="600" prefHeight="400">
+        <columns>
+            <TableColumn fx:id="categoryColumn" text="Category" />
+
+<!--            <TableColumn fx:id="yearColumn" text="Year"/>-->
+            <TableColumn fx:id="noOfBooksColumn" text="No. of Books"/>
+            <TableColumn fx:id="specimensColumn" text="Specimens"/>
+            <TableColumn fx:id="purchasedColumn" text="Purchased"/>
+            <TableColumn fx:id="totalBooksColumn" text="Total Books"/>
+            <TableColumn fx:id="totalAmountColumn" text="Total Amount"/>
+        </columns>
+    </TableView>
+
+</AnchorPane>

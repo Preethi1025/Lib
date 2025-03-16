@@ -260,20 +260,7 @@ public class LibraryController {
         return barChart;
     }
 
-//    @FXML
-//    private void handleSearch() {
-//        String selectedCriteria = searchCriteriaBox.getValue();
-//        if (selectedCriteria == null) {
-//            showAlert("Please select a search criteria.");
-//            return;
-//        }
-//
-//        TextInputDialog inputDialog = new TextInputDialog();
-//        inputDialog.setTitle("Search");
-//        inputDialog.setHeaderText("Enter " + selectedCriteria + " to search:");
-//        inputDialog.setContentText(selectedCriteria + ":");
-//        inputDialog.showAndWait().ifPresent(input -> fetchBooks(selectedCriteria, input));
-//    }
+
 @FXML
 private MenuButton semesterMenu, filterYearMenu, purchaseMenu, departmentMenu, supplierMenu;
 
@@ -284,15 +271,7 @@ private MenuButton semesterMenu, filterYearMenu, purchaseMenu, departmentMenu, s
 
 
 
-//    @FXML
-//    public void initialize() {
-//        // Debugging to check if FXML elements are initialized
-//        if (semesterMenu == null || filterYearMenu == null || purchaseMenu == null || departmentMenu == null || supplierMenu == null) {
-//            System.out.println("Error: One or more MenuButton elements are null!");
-//        } else {
-//            System.out.println("All MenuButtons are initialized successfully.");
-//        }
-//    }
+
 
     @FXML
     private void handleSearch() {
@@ -420,58 +399,58 @@ private MenuButton semesterMenu, filterYearMenu, purchaseMenu, departmentMenu, s
 
 
 
-    private void fetchBooks(String criteria, String value) {
-        String columnName = switch (criteria) {
-            case "Semester" -> "semester";
-            case "Year" -> "year";
-            case "Purchase Type" -> "purchase_type";
-            case "Invoice No" -> "invoice_no";
-            case "Book Supplier Name" -> "name_of_the_book_supplier";
-            case "Department Subject" -> "department_subject";
-            default -> throw new IllegalArgumentException("Invalid search criteria");
-        };
-
-        ObservableList<Book> booksList = FXCollections.observableArrayList();
-        String query = "SELECT * FROM 2023_2024_data WHERE " + columnName + " LIKE ?";
-
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setString(1, "%" + value + "%");
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                booksList.add(new Book(
-                        resultSet.getInt("id"),
-                        resultSet.getString("semester"),
-                        resultSet.getString("engg_mba"),
-                        resultSet.getInt("year"),
-                        resultSet.getString("month"),
-                        resultSet.getString("date_of_invoice"),
-                        resultSet.getString("purchase_type"),
-                        resultSet.getString("invoice_no"),
-                        resultSet.getString("name_of_the_book_supplier"), // New Field
-                        resultSet.getString("department_subject"),
-                        resultSet.getInt("book_accn_no_from"),
-                        resultSet.getInt("book_accn_no_to"),
-                        resultSet.getInt("no_of_books"),
-                        resultSet.getInt("no_of_books_purchased"),
-                        resultSet.getInt("no_of_books_donated"),
-                        resultSet.getString("acc_reg_no"),
-                        resultSet.getInt("accn_register_page_no_from"),
-                        resultSet.getInt("accn_register_page_no_to"),
-                        resultSet.getDouble("discount_percentage"),
-                        resultSet.getInt("gross_invoice_amount"),
-                        resultSet.getDouble("discount_amount"),
-                        resultSet.getInt("net_amount")
-                ));
-            }
-
-            booksTable.setItems(booksList);
-        } catch (SQLException e) {
-            showAlert("Error fetching records: " + e.getMessage());
-        }
-    }
+//    private void fetchBooks(String criteria, String value) {
+//        String columnName = switch (criteria) {
+//            case "Semester" -> "semester";
+//            case "Year" -> "year";
+//            case "Purchase Type" -> "purchase_type";
+//            case "Invoice No" -> "invoice_no";
+//            case "Book Supplier Name" -> "name_of_the_book_supplier";
+//            case "Department Subject" -> "department_subject";
+//            default -> throw new IllegalArgumentException("Invalid search criteria");
+//        };
+//
+//        ObservableList<Book> booksList = FXCollections.observableArrayList();
+//        String query = "SELECT * FROM 2023_2024_data WHERE " + columnName + " LIKE ?";
+//
+//        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+//             PreparedStatement statement = connection.prepareStatement(query)) {
+//
+//            statement.setString(1, "%" + value + "%");
+//            ResultSet resultSet = statement.executeQuery();
+//
+//            while (resultSet.next()) {
+//                booksList.add(new Book(
+//                        resultSet.getInt("id"),
+//                        resultSet.getString("semester"),
+//                        resultSet.getString("engg_mba"),
+//                        resultSet.getInt("year"),
+//                        resultSet.getString("month"),
+//                        resultSet.getString("date_of_invoice"),
+//                        resultSet.getString("purchase_type"),
+//                        resultSet.getString("invoice_no"),
+//                        resultSet.getString("name_of_the_book_supplier"), // New Field
+//                        resultSet.getString("department_subject"),
+//                        resultSet.getInt("book_accn_no_from"),
+//                        resultSet.getInt("book_accn_no_to"),
+//                        resultSet.getInt("no_of_books"),
+//                        resultSet.getInt("no_of_books_purchased"),
+//                        resultSet.getInt("no_of_books_donated"),
+//                        resultSet.getString("acc_reg_no"),
+//                        resultSet.getInt("accn_register_page_no_from"),
+//                        resultSet.getInt("accn_register_page_no_to"),
+//                        resultSet.getDouble("discount_percentage"),
+//                        resultSet.getInt("gross_invoice_amount"),
+//                        resultSet.getDouble("discount_amount"),
+//                        resultSet.getInt("net_amount")
+//                ));
+//            }
+//
+//            booksTable.setItems(booksList);
+//        } catch (SQLException e) {
+//            showAlert("Error fetching records: " + e.getMessage());
+//        }
+//    }
 
     @FXML
     private void openNewForm() {
