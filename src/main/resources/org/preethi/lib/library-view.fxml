@@ -73,12 +73,12 @@
     <MenuButton text="Select Supplier" fx:id="supplierMenu">
       <items>
         <CheckMenuItem text="TBH" onAction="#handleSearch"/>
-<!--        <CheckMenuItem text="Dhanam" onAction="#handleSearch"/>-->
-<!--        <CheckMenuItem text="MR Anburaj Civil" onAction="#handleSearch"/>-->
-<!--        <CheckMenuItem text="Dr Rajkumar" onAction="#handleSearch"/>-->
-<!--        <CheckMenuItem text="Amazon" onAction="#handleSearch"/>-->
-<!--        <CheckMenuItem text="Lakshmi Publication" onAction="#handleSearch"/>-->
-<!--        <CheckMenuItem text="Donations" onAction="#handleSearch"/>-->
+        <CheckMenuItem text="Dhanam" onAction="#handleSearch"/>
+        <CheckMenuItem text="MR Anburaj Civil" onAction="#handleSearch"/>
+        <CheckMenuItem text="Dr Rajkumar" onAction="#handleSearch"/>
+        <CheckMenuItem text="Amazon" onAction="#handleSearch"/>
+        <CheckMenuItem text="Lakshmi Publication" onAction="#handleSearch"/>
+        <CheckMenuItem text="Donations" onAction="#handleSearch"/>
 
       </items>
 
@@ -118,6 +118,7 @@
     <Button text="Generate Report" onAction="#handleGenerateReport"/>
     <Button text="List of Books (May - June 2024)" onAction="#openHtmlPage"/>
     <Button text="New" onAction="#openNewForm"/>
+    <Button text="Download" onAction="#generateReport"/>
   </HBox>
 
   <!-- Table to Display Search Results -->

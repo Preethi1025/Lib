@@ -1,5 +1,12 @@
 package org.preethi.lib;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+
+import com.itextpdf.layout.properties.UnitValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -16,6 +23,7 @@ import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.*;
 import javafx.scene.chart.PieChart;
@@ -26,6 +34,10 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.layout.VBox;
 import java.util.*;
 import java.util.List;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+
 import java.util.stream.Collectors;
 
 public class LibraryController {
@@ -291,7 +303,10 @@ private MenuButton semesterMenu, filterYearMenu, purchaseMenu, departmentMenu, s
         addSelectedCriteria(criteriaList, conditions, values, "Year", filterYearMenu, "year");
         addSelectedCriteria(criteriaList, conditions, values, "Purchase Type", purchaseMenu, "purchase_type");
         addSelectedCriteria(criteriaList, conditions, values, "Department", departmentMenu, "department_subject");
-        addSelectedCriteria(criteriaList, conditions, values, "Book Supplier Name", supplierMenu, "name_of_the_book_supplier");
+         supplierMenu.getText().trim(); // Get and trim selected text
+        addSelectedCriteria(criteriaList, conditions, values, "Book Supplier Name",
+                supplierMenu,"name_of_the_book_supplier");
+
 
         selectedCriteriaLabel.setText(criteriaList.isEmpty() ? "None" : String.join(", ", criteriaList));
 
@@ -398,59 +413,6 @@ private MenuButton semesterMenu, filterYearMenu, purchaseMenu, departmentMenu, s
     }
 
 
-
-//    private void fetchBooks(String criteria, String value) {
-//        String columnName = switch (criteria) {
-//            case "Semester" -> "semester";
-//            case "Year" -> "year";
-//            case "Purchase Type" -> "purchase_type";
-//            case "Invoice No" -> "invoice_no";
-//            case "Book Supplier Name" -> "name_of_the_book_supplier";
-//            case "Department Subject" -> "department_subject";
-//            default -> throw new IllegalArgumentException("Invalid search criteria");
-//        };
-//
-//        ObservableList<Book> booksList = FXCollections.observableArrayList();
-//        String query = "SELECT * FROM 2023_2024_data WHERE " + columnName + " LIKE ?";
-//
-//        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-//             PreparedStatement statement = connection.prepareStatement(query)) {
-//
-//            statement.setString(1, "%" + value + "%");
-//            ResultSet resultSet = statement.executeQuery();
-//
-//            while (resultSet.next()) {
-//                booksList.add(new Book(
-//                        resultSet.getInt("id"),
-//                        resultSet.getString("semester"),
-//                        resultSet.getString("engg_mba"),
-//                        resultSet.getInt("year"),
-//                        resultSet.getString("month"),
-//                        resultSet.getString("date_of_invoice"),
-//                        resultSet.getString("purchase_type"),
-//                        resultSet.getString("invoice_no"),
-//                        resultSet.getString("name_of_the_book_supplier"), // New Field
-//                        resultSet.getString("department_subject"),
-//                        resultSet.getInt("book_accn_no_from"),
-//                        resultSet.getInt("book_accn_no_to"),
-//                        resultSet.getInt("no_of_books"),
-//                        resultSet.getInt("no_of_books_purchased"),
-//                        resultSet.getInt("no_of_books_donated"),
-//                        resultSet.getString("acc_reg_no"),
-//                        resultSet.getInt("accn_register_page_no_from"),
-//                        resultSet.getInt("accn_register_page_no_to"),
-//                        resultSet.getDouble("discount_percentage"),
-//                        resultSet.getInt("gross_invoice_amount"),
-//                        resultSet.getDouble("discount_amount"),
-//                        resultSet.getInt("net_amount")
-//                ));
-//            }
-//
-//            booksTable.setItems(booksList);
-//        } catch (SQLException e) {
-//            showAlert("Error fetching records: " + e.getMessage());
-//        }
-//    }
 
     @FXML
     private void openNewForm() {
@@ -692,6 +654,54 @@ private MenuButton semesterMenu, filterYearMenu, purchaseMenu, departmentMenu, s
             showAlert("Error fetching records: " + e.getMessage());
         }
     }
+    @FXML
+    private void generateReport() {
+        if (searchResults.isEmpty()) {
+            showAlert("No search results to generate a report.");
+            return;
+        }
+
+        String userHome = System.getProperty("user.home");
+        String downloadsPath = userHome + File.separator + "Downloads";
+        String fileName = "Library_Report_" + System.currentTimeMillis() + ".pdf";
+        File file = new File(downloadsPath, fileName);
+
+        try (PdfWriter writer = new PdfWriter(new FileOutputStream(file));
+             PdfDocument pdf = new PdfDocument(writer);
+             Document document = new Document(pdf)) {
+
+            document.add(new Paragraph("Library Search Report")
+                    .setBold()
+                    .setFontSize(16)
+                    .setUnderline()
+                    .setMarginBottom(10));
+
+            float[] columnWidths = {50f, 100f, 150f, 100f, 100f, 100f, 100f};
+            Table table = new Table(UnitValue.createPointArray(columnWidths)).useAllAvailableWidth();
+
+            String[] headers = {"ID", "Semester", "Department", "Purchase Type", "Invoice No", "Supplier", "Net Amount"};
+            for (String header : headers) {
+                table.addHeaderCell(new Cell().add(new Paragraph(header).setBold()));
+            }
+
+            for (Book book : searchResults) {
+                table.addCell(new Cell().add(new Paragraph(String.valueOf(book.getId()))));
+                table.addCell(new Cell().add(new Paragraph(book.getSemester())));
+                table.addCell(new Cell().add(new Paragraph(book.getDepartmentSubject())));
+                table.addCell(new Cell().add(new Paragraph(book.getPurchaseType())));
+                table.addCell(new Cell().add(new Paragraph(book.getInvoiceNo())));
+                table.addCell(new Cell().add(new Paragraph(book.getNameOfTheBookSupplier())));
+                table.addCell(new Cell().add(new Paragraph(String.valueOf(book.getNetAmount()))));
+            }
+
+            document.add(table);
+            showAlert("Report successfully saved: " + file.getAbsolutePath());
+
+        } catch (IOException e) {
+            showAlert("Error generating PDF: " + e.getMessage());
+        }
+    }
+
 
 
 
