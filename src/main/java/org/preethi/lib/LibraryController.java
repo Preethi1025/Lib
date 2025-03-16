@@ -159,7 +159,6 @@ public class LibraryController {
         );
 
         table.setItems(data);
-
         VBox vbox = new VBox(table);
         Scene scene = new Scene(vbox, 800, 400);
         statementStage.setScene(scene);
@@ -419,13 +418,25 @@ public class LibraryController {
     }
 
     @FXML
-    private MenuItem year2023, year2024, purchasedOption, donationOption;
+    private MenuItem year2023, year2024, purchasedOption, donationOption,odd,even;
 
     @FXML
     private void handleYearSelection(ActionEvent event) {
         MenuItem selected = (MenuItem) event.getSource();
         String year = selected.getText();
         fetchBook("Year", year);
+    }
+
+    @FXML
+    private void handleSemSelection(ActionEvent event) {
+        MenuItem selected = (MenuItem) event.getSource();
+        String semester = selected.getText(); // Get selected semester (ODD or EVEN)
+        fetchBook("Sem", semester); // Pass the selected semester to fetchBook
+    }
+    @FXML
+    private void handleAllYearsSelection(ActionEvent event) {
+        System.out.println("All years selected");
+        fetchBook("Sem", "All");
     }
 
     @FXML
@@ -439,33 +450,141 @@ public class LibraryController {
     }
 
     private void fetchBook(String criteria, String value) {
-        String columnName = switch (criteria) {
-            case "Year" -> "year";
-            case "Purchase Type" -> "purchase_type";
-            default -> throw new IllegalArgumentException("Invalid criteria");
-        };
+        String columnName;
+        String query;
+
+        if ("All".equals(value)) {
+            // Fetch all records when "All" is selected (no WHERE condition)
+            query = "SELECT engg_mba AS category, SUM(no_of_books) AS no_of_books, " +
+                    "SUM(no_of_books_donated) AS specimens, SUM(no_of_books_purchased) AS purchased, " +
+                    "SUM(no_of_books_purchased + no_of_books_donated) AS total_books, " +
+                    "SUM(net_amount) AS total_amount " +
+                    "FROM 2023_2024_data GROUP BY engg_mba";
+        } else {
+            // Map criteria to the corresponding column in the database
+            columnName = switch (criteria) {
+                case "Year" -> "year";
+                case "Purchase Type" -> "purchase_type";
+                case "Sem" -> "semester";
+                default -> throw new IllegalArgumentException("Invalid criteria: " + criteria);
+            };
+
+            query = "SELECT engg_mba AS category, SUM(no_of_books) AS no_of_books, " +
+                    "SUM(no_of_books_donated) AS specimens, SUM(no_of_books_purchased) AS purchased, " +
+                    "SUM(no_of_books_purchased + no_of_books_donated) AS total_books, " +
+                    "SUM(net_amount) AS total_amount " +
+                    "FROM 2023_2024_data WHERE " + columnName + " = ? GROUP BY engg_mba";
+        }
+
+        // Query to fetch access number-wise book count
+        String accessNumberQuery = "SELECT engg_mba AS category, " +
+                "MIN(book_accn_no_from) AS accn_no_from, " +
+                "MAX(book_accn_no_to) AS accn_no_to, " +
+                "(MAX(book_accn_no_to) - MIN(book_accn_no_from) + 1) AS calculated_books " +
+                "FROM 2023_2024_data GROUP BY engg_mba";
+
+        // Additional query for time-based summary
+        String timePeriodQuery = "SELECT " +
+                "CASE " +
+                "WHEN month BETWEEN 6 AND 12 AND year = 2023 THEN 'June to Dec 2023' " +
+                "WHEN month BETWEEN 1 AND 5 AND year = 2024 THEN 'Jan to May 2024' " +
+                "END AS category, " +
+                "SUM(no_of_books) AS no_of_books, " +
+                "SUM(no_of_books_donated) AS specimens, " +
+                "SUM(no_of_books_purchased) AS purchased, " +
+                "SUM(no_of_books_purchased + no_of_books_donated) AS total_books, " +
+                "SUM(net_amount) AS total_amount " +
+                "FROM 2023_2024_data " +
+                "WHERE year IN (2023, 2024) " +
+                "GROUP BY category " +
+                "UNION ALL " +
+                "SELECT 'Total' AS category, " +
+                "SUM(no_of_books), SUM(no_of_books_donated), SUM(no_of_books_purchased), " +
+                "SUM(no_of_books_purchased + no_of_books_donated), SUM(net_amount) " +
+                "FROM 2023_2024_data WHERE year IN (2023, 2024);";
 
         ObservableList<BookSummary> summaryList = FXCollections.observableArrayList();
-        String query = "SELECT year, no_of_books, no_of_books_donated AS specimens, no_of_books_purchased AS purchased, (no_of_books_purchased + no_of_books_donated) AS total_books, net_amount AS total_amount FROM 2023_2024_data WHERE " + columnName + " = ?";
 
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement1 = connection.prepareStatement(query);
+             PreparedStatement statement2 = connection.prepareStatement(timePeriodQuery);
+             PreparedStatement statement3 = connection.prepareStatement(accessNumberQuery)) {
 
-            statement.setString(1, value);
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                summaryList.add(new BookSummary(
-                        resultSet.getInt("year"),
-                        resultSet.getInt("no_of_books"),
-                        resultSet.getInt("specimens"),
-                        resultSet.getInt("purchased"),
-                        resultSet.getInt("total_books"),
-                        resultSet.getInt("total_amount")
-                ));
+            // If not "All", set the parameter in the query
+            if (!"All".equals(value)) {
+                statement1.setString(1, value);
             }
 
-            // Open new window and show data
+            ResultSet resultSet1 = statement1.executeQuery();
+            int totalNoOfBooks = 0, totalSpecimens = 0, totalPurchased = 0, totalBooks = 0, totalAmount = 0;
+
+            // Process first query results (grouped by engg_mba)
+            while (resultSet1.next()) {
+                String category = resultSet1.getString("category");
+                int noOfBooks = resultSet1.getInt("no_of_books");
+                int specimens = resultSet1.getInt("specimens");
+                int purchased = resultSet1.getInt("purchased");
+                int totalBookCount = resultSet1.getInt("total_books");
+                int totalAmt = resultSet1.getInt("total_amount");
+
+                summaryList.add(new BookSummary(category, 0, noOfBooks, specimens, purchased, totalBookCount, totalAmt));
+
+                // Aggregate total summary
+                totalNoOfBooks += noOfBooks;
+                totalSpecimens += specimens;
+                totalPurchased += purchased;
+                totalBooks += totalBookCount;
+                totalAmount += totalAmt;
+            }
+
+            // Ensure first query results are included before adding totals
+            if (!summaryList.isEmpty()) {
+                summaryList.add(new BookSummary("Total Books", 0, totalNoOfBooks, totalSpecimens, totalPurchased, totalBooks, totalAmount));
+            }
+
+            ResultSet resultSet2 = statement2.executeQuery();
+            boolean firstEntry = true;
+
+            // Process second query results (grouped by time period)
+            while (resultSet2.next()) {
+                if (firstEntry) {
+                    //summaryList.add(new BookSummary("", 0, 0, 0, 0, 0, 0)); // Blank row before "June to Dec 2023"
+                    firstEntry = false;
+                }
+
+                String category = resultSet2.getString("category");
+                int noOfBooks = resultSet2.getInt("no_of_books");
+                int specimens = resultSet2.getInt("specimens");
+                int purchased = resultSet2.getInt("purchased");
+                int totalBookCount = resultSet2.getInt("total_books");
+                int totalAmt = resultSet2.getInt("total_amount");
+
+                summaryList.add(new BookSummary(category, 0, noOfBooks, specimens, purchased, totalBookCount, totalAmt));
+            }
+
+           // summaryList.add(new BookSummary("", , 0, 0, 0, 0, 0)); // Blank row after "Total"
+
+            ResultSet resultSet3 = statement3.executeQuery();
+
+            // Process access number-wise book calculation
+            while (resultSet3.next()) {
+                String category = resultSet3.getString("category");
+                int accnNoFrom = resultSet3.getInt("accn_no_from");
+                int accnNoTo = resultSet3.getInt("accn_no_to");
+                int calculatedBooks = resultSet3.getInt("calculated_books");
+
+                // Find the corresponding actual total_books value
+                int actualTotalBooks = summaryList.stream()
+                        .filter(book -> book.getCategory().equals(category))
+                        .mapToInt(BookSummary::getTotalBooks)
+                        .findFirst().orElse(0);
+
+                String tallyStatus = (calculatedBooks == actualTotalBooks) ? "Tallied" : "Mismatch";
+
+                summaryList.add(new BookSummary(category + " (Accn_no_from and Accn_no_to)", accnNoFrom, accnNoTo, calculatedBooks, actualTotalBooks, tallyStatus));
+            }
+
+            // Open new window and show summarized data
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/preethi/lib/book_summary.fxml"));
             Parent root = loader.load();
 
@@ -481,6 +600,7 @@ public class LibraryController {
             showAlert("Error fetching records: " + e.getMessage());
         }
     }
+
 
 
 }

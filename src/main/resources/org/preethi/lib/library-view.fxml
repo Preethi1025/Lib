@@ -13,6 +13,9 @@
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.CustomMenuItem?>
 <VBox spacing="20" alignment="CENTER" xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml" fx:controller="org.preethi.lib.LibraryController" fx:id="rootPane">
 
@@ -27,14 +30,31 @@
       <items>
         <Menu fx:id="yearMenu" text="Year">
           <items>
-            <MenuItem fx:id="year2023" text="2023" onAction="#handleYearSelection"/>
-            <MenuItem fx:id="year2024" text="2024" onAction="#handleYearSelection"/>
+            <MenuItem fx:id="allYears" text="All" onAction="#handleAllYearsSelection"/>
+
+            <Menu fx:id="year2023" text="2023">
+              <items>
+                <MenuItem fx:id="odd2023" text="ODD" onAction="#handleSemSelection"/>
+                <MenuItem fx:id="even2023" text="EVEN" onAction="#handleSemSelection"/>
+              </items>
+            </Menu>
+
+            <Menu fx:id="year2024" text="2024">
+              <items>
+                <MenuItem fx:id="odd2024" text="ODD" onAction="#handleSemSelection"/>
+                <MenuItem fx:id="even2024" text="EVEN" onAction="#handleSemSelection"/>
+              </items>
+            </Menu>
           </items>
         </Menu>
+
         <MenuItem fx:id="purchasedOption" text="Purchased" onAction="#handlePurchaseSelection"/>
         <MenuItem fx:id="donationOption" text="Donation" onAction="#handleDonationSelection"/>
       </items>
     </MenuButton>
+
+
+
 
 
 
