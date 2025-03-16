@@ -8,6 +8,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
@@ -23,11 +25,15 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.VBox;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LibraryController {
 
-    @FXML
-    private ComboBox<String> searchCriteriaBox;
+
+
+    private ObservableList<Book> searchResults = FXCollections.observableArrayList();
+
     @FXML
     private TableView<Book> booksTable;
     @FXML
@@ -76,15 +82,15 @@ public class LibraryController {
     private TableColumn<Book, Integer> netAmountColumn;
 
 
+
+
     private static final String URL = "jdbc:mysql://localhost:3306/library";
     private static final String USER = "root";
     private static final String PASSWORD = "Preethi1002@";
 
     @FXML
     public void initialize() {
-        searchCriteriaBox.setItems(FXCollections.observableArrayList(
-                "Semester", "Year", "Purchase Type", "Invoice No","Book Supplier Name", "Department Subject"
-        ));
+
 
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         semesterColumn.setCellValueFactory(new PropertyValueFactory<>("semester"));
@@ -105,6 +111,7 @@ public class LibraryController {
         accnRegisterPageNoFromColumn.setCellValueFactory(new PropertyValueFactory<>("accnRegisterPageNoFrom"));
         accnRegisterPageNoToColumn.setCellValueFactory(new PropertyValueFactory<>("accnRegisterPageNoTo"));
         discountPercentageColumn.setCellValueFactory(new PropertyValueFactory<>("discountPercentage"));
+        discountPercentageColumn.setCellValueFactory(new PropertyValueFactory<>("discountPercentage"));
         grossInvoiceAmountColumn.setCellValueFactory(new PropertyValueFactory<>("grossInvoiceAmount"));
         discountAmountColumn.setCellValueFactory(new PropertyValueFactory<>("discountAmount"));
         netAmountColumn.setCellValueFactory(new PropertyValueFactory<>("netAmount"));
@@ -113,6 +120,7 @@ public class LibraryController {
     }
     //    @FXML private TableView<Book> booksTable;
 // Reference to TableView
+
     @FXML
     private MenuButton statementButton;
 
@@ -124,46 +132,6 @@ public class LibraryController {
 
 
 
-    private void showStatement() {
-        Stage statementStage = new Stage();
-        statementStage.setTitle("Library Book Statement");
-
-        TableView<BookData> table = new TableView<>();
-
-        // Define table columns
-        TableColumn<BookData, String> categoryCol = new TableColumn<>("Category");
-        categoryCol.setCellValueFactory(new PropertyValueFactory<>("category"));
-
-        TableColumn<BookData, Integer> booksCol = new TableColumn<>("No of Books");
-        booksCol.setCellValueFactory(new PropertyValueFactory<>("books"));
-
-        TableColumn<BookData, Integer> specimensCol = new TableColumn<>("Specimens");
-        specimensCol.setCellValueFactory(new PropertyValueFactory<>("specimens"));
-
-        TableColumn<BookData, Integer> purchasedCol = new TableColumn<>("Purchased");
-        purchasedCol.setCellValueFactory(new PropertyValueFactory<>("purchased"));
-
-        TableColumn<BookData, Integer> totalBooksCol = new TableColumn<>("Total Books");
-        totalBooksCol.setCellValueFactory(new PropertyValueFactory<>("totalBooks"));
-
-        TableColumn<BookData, Double> amountCol = new TableColumn<>("Total Amount");
-        amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
-
-        table.getColumns().addAll(categoryCol, booksCol, specimensCol, purchasedCol, totalBooksCol, amountCol);
-
-        // Load data into table
-        ObservableList<BookData> data = FXCollections.observableArrayList(
-                new BookData("ENGINEERING", 457, 224, 233, 457, 307197),
-                new BookData("MBA", 105, 105, 0, 105, 0),
-                new BookData("Total", 562, 329, 233, 562, 307197)
-        );
-
-        table.setItems(data);
-        VBox vbox = new VBox(table);
-        Scene scene = new Scene(vbox, 800, 400);
-        statementStage.setScene(scene);
-        statementStage.show();
-    }
 
     // Model Class for BookData
     public static class BookData {
@@ -292,20 +260,165 @@ public class LibraryController {
         return barChart;
     }
 
+//    @FXML
+//    private void handleSearch() {
+//        String selectedCriteria = searchCriteriaBox.getValue();
+//        if (selectedCriteria == null) {
+//            showAlert("Please select a search criteria.");
+//            return;
+//        }
+//
+//        TextInputDialog inputDialog = new TextInputDialog();
+//        inputDialog.setTitle("Search");
+//        inputDialog.setHeaderText("Enter " + selectedCriteria + " to search:");
+//        inputDialog.setContentText(selectedCriteria + ":");
+//        inputDialog.showAndWait().ifPresent(input -> fetchBooks(selectedCriteria, input));
+//    }
+@FXML
+private MenuButton semesterMenu, filterYearMenu, purchaseMenu, departmentMenu, supplierMenu;
+
+    @FXML
+    private Label selectedCriteriaLabel;
+
+ // Ensure this is linked to your TableView
+
+
+
+//    @FXML
+//    public void initialize() {
+//        // Debugging to check if FXML elements are initialized
+//        if (semesterMenu == null || filterYearMenu == null || purchaseMenu == null || departmentMenu == null || supplierMenu == null) {
+//            System.out.println("Error: One or more MenuButton elements are null!");
+//        } else {
+//            System.out.println("All MenuButtons are initialized successfully.");
+//        }
+//    }
+
     @FXML
     private void handleSearch() {
-        String selectedCriteria = searchCriteriaBox.getValue();
-        if (selectedCriteria == null) {
-            showAlert("Please select a search criteria.");
+        List<String> criteriaList = new ArrayList<>();
+        List<String> conditions = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+
+        // Update button text dynamically based on selected items
+        updateMenuButtonText(semesterMenu);
+        updateMenuButtonText(filterYearMenu);
+        updateMenuButtonText(purchaseMenu);
+        updateMenuButtonText(departmentMenu);
+        updateMenuButtonText(supplierMenu);
+
+        // Add selected criteria
+        addSelectedCriteria(criteriaList, conditions, values, "Semester", semesterMenu, "semester");
+        addSelectedCriteria(criteriaList, conditions, values, "Year", filterYearMenu, "year");
+        addSelectedCriteria(criteriaList, conditions, values, "Purchase Type", purchaseMenu, "purchase_type");
+        addSelectedCriteria(criteriaList, conditions, values, "Department", departmentMenu, "department_subject");
+        addSelectedCriteria(criteriaList, conditions, values, "Book Supplier Name", supplierMenu, "name_of_the_book_supplier");
+
+        selectedCriteriaLabel.setText(criteriaList.isEmpty() ? "None" : String.join(", ", criteriaList));
+
+        if (conditions.isEmpty()) {
+            showAlert("Please select at least one filter.");
             return;
         }
 
-        TextInputDialog inputDialog = new TextInputDialog();
-        inputDialog.setTitle("Search");
-        inputDialog.setHeaderText("Enter " + selectedCriteria + " to search:");
-        inputDialog.setContentText(selectedCriteria + ":");
-        inputDialog.showAndWait().ifPresent(input -> fetchBooks(selectedCriteria, input));
+        // Construct the SQL query
+        String query = "SELECT * FROM 2023_2024_data";
+        if (!conditions.isEmpty()) {
+            query += " WHERE " + String.join(" AND ", conditions);
+        }
+
+        searchResults.clear();
+
+        try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            for (int i = 0; i < values.size(); i++) {
+                statement.setString(i + 1, values.get(i));
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                searchResults.add(new Book(
+                        resultSet.getInt("id"),
+                        resultSet.getString("semester"),
+                        resultSet.getString("engg_mba"),
+                        resultSet.getInt("year"),
+                        resultSet.getString("month"),
+                        resultSet.getString("date_of_invoice"),
+                        resultSet.getString("purchase_type"),
+                        resultSet.getString("invoice_no"),
+                        resultSet.getString("name_of_the_book_supplier"),
+                        resultSet.getString("department_subject"),
+                        resultSet.getInt("book_accn_no_from"),
+                        resultSet.getInt("book_accn_no_to"),
+                        resultSet.getInt("no_of_books"),
+                        resultSet.getInt("no_of_books_purchased"),
+                        resultSet.getInt("no_of_books_donated"),
+                        resultSet.getString("acc_reg_no"),
+                        resultSet.getInt("accn_register_page_no_from"),
+                        resultSet.getInt("accn_register_page_no_to"),
+                        resultSet.getDouble("discount_percentage"),
+                        resultSet.getInt("gross_invoice_amount"),
+                        resultSet.getDouble("discount_amount"),
+                        resultSet.getInt("net_amount")
+                ));
+            }
+
+            booksTable.setItems(searchResults);
+        } catch (SQLException e) {
+            showAlert("Error fetching records: " + e.getMessage());
+        }
     }
+
+    private void addSelectedCriteria(List<String> criteriaList, List<String> conditions, List<String> values,
+                                     String label, MenuButton menu, String dbColumn) {
+        if (menu == null) {
+            System.out.println("Error: " + label + " MenuButton is null!");
+            return;
+        }
+
+        List<String> selected = getSelectedFromMenu(menu);
+        if (!selected.isEmpty()) {
+            criteriaList.add(label + ": " + String.join("/", selected));
+
+            // Ensure SQL query placeholders match the number of selected values
+            String placeholders = String.join(", ", Collections.nCopies(selected.size(), "?"));
+            conditions.add(dbColumn + " IN (" + placeholders + ")");
+            values.addAll(selected);
+        }
+    }
+
+    private void updateMenuButtonText(MenuButton menuButton) {
+        if (menuButton == null) {
+            System.out.println("Error: MenuButton is null!");
+            return;
+        }
+
+        List<String> selectedItems = getSelectedFromMenu(menuButton);
+        if (selectedItems.isEmpty()) {
+            menuButton.setText("Select " + menuButton.getId()); // Dynamic text
+        } else {
+            menuButton.setText(String.join(", ", selectedItems));
+        }
+    }
+
+    private List<String> getSelectedFromMenu(MenuButton menu) {
+        List<String> selected = new ArrayList<>();
+
+        if (menu == null) {
+            System.out.println("Error: MenuButton is null!");
+            return selected;
+        }
+
+        for (MenuItem item : menu.getItems()) {
+            if (item instanceof CheckMenuItem checkItem && checkItem.isSelected()) {
+                selected.add(checkItem.getText());
+            }
+        }
+        return selected;
+    }
+
+
 
     private void fetchBooks(String criteria, String value) {
         String columnName = switch (criteria) {

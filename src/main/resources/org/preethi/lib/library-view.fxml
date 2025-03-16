@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.ComboBox?>
@@ -6,65 +7,116 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.Label?>
-
-
-<?import javafx.collections.FXCollections?>
-<?import java.lang.String?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.CheckMenuItem?>
-<?import javafx.scene.control.CustomMenuItem?>
+
 <VBox spacing="20" alignment="CENTER" xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml" fx:controller="org.preethi.lib.LibraryController" fx:id="rootPane">
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.preethi.lib.LibraryController"
+      fx:id="rootPane">
 
-  <Label text="Saranathan College of Engineering" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-  <Label text="Autonomous Institution" style="-fx-font-size: 16px; -fx-font-style: italic;"/>
+  <!-- College Details -->
+  <Label text="Saranathan College of Engineering"
+         style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+  <Label text="Autonomous Institution"
+         style="-fx-font-size: 16px; -fx-font-style: italic;"/>
 
+  <!-- Selected Criteria Display -->
   <HBox spacing="10" alignment="CENTER">
-    <ComboBox fx:id="searchCriteriaBox" promptText="Select Search Criteria"/>
-    <Button text="Search" onAction="#handleSearch"/>
+    <Label text="Selected Criteria: " style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+    <Label fx:id="selectedCriteriaLabel" text="None"
+           style="-fx-font-size: 14px; -fx-text-fill: blue;"/>
+  </HBox>
 
-    <MenuButton fx:id="statementButton" text="Show Statement">
+  <!-- Filter Selection Menus -->
+  <HBox spacing="10" alignment="CENTER">
+
+    <MenuButton text="Select Semester" fx:id="semesterMenu">
       <items>
-        <Menu fx:id="yearMenu" text="Year">
-          <items>
-            <MenuItem fx:id="allYears" text="All" onAction="#handleAllYearsSelection"/>
-
-            <Menu fx:id="year2023" text="2023">
-              <items>
-                <MenuItem fx:id="odd2023" text="ODD" onAction="#handleSemSelection"/>
-                <MenuItem fx:id="even2023" text="EVEN" onAction="#handleSemSelection"/>
-              </items>
-            </Menu>
-
-            <Menu fx:id="year2024" text="2024">
-              <items>
-                <MenuItem fx:id="odd2024" text="ODD" onAction="#handleSemSelection"/>
-                <MenuItem fx:id="even2024" text="EVEN" onAction="#handleSemSelection"/>
-              </items>
-            </Menu>
-          </items>
-        </Menu>
-
-        <MenuItem fx:id="purchasedOption" text="Purchased" onAction="#handlePurchaseSelection"/>
-        <MenuItem fx:id="donationOption" text="Donation" onAction="#handleDonationSelection"/>
+        <CheckMenuItem text="ODD" onAction="#handleSearch" />
+        <CheckMenuItem text="EVEN" onAction="#handleSearch"/>
       </items>
     </MenuButton>
 
+    <MenuButton text="Select Year" fx:id="filterYearMenu">
+      <items>
+        <CheckMenuItem text="2023" onAction="#handleSearch"/>
+        <CheckMenuItem text="2024" onAction="#handleSearch"/>
+      </items>
+    </MenuButton>
 
+    <MenuButton text="Select Purchase Type" fx:id="purchaseMenu">
+      <items>
+        <CheckMenuItem text="Purchase" onAction="#handleSearch"/>
+        <CheckMenuItem text="Specimen" onAction="#handleSearch"/>
+        <CheckMenuItem text="Donation" onAction="#handleSearch"/>
+      </items>
+    </MenuButton>
 
+    <MenuButton text="Select Department" fx:id="departmentMenu">
+      <items>
+        <CheckMenuItem text="ALL" onAction="#handleSearch"/>
+        <CheckMenuItem text="CSE" onAction="#handleSearch"/>
+        <CheckMenuItem text="CSE AIML" onAction="#handleSearch"/>
+        <CheckMenuItem text="CSBS" onAction="#handleSearch"/>
+        <CheckMenuItem text="EEE" onAction="#handleSearch"/>
+        <CheckMenuItem text="MECH" onAction="#handleSearch"/>
+        <CheckMenuItem text="Civil" onAction="#handleSearch"/>
+        <CheckMenuItem text="IT" onAction="#handleSearch"/>
+        <CheckMenuItem text="ICE" onAction="#handleSearch"/>
+      </items>
+    </MenuButton>
 
+    <MenuButton text="Select Supplier" fx:id="supplierMenu">
+      <items>
+        <CheckMenuItem text="TBH" onAction="#handleSearch"/>
+<!--        <CheckMenuItem text="Dhanam" onAction="#handleSearch"/>-->
+<!--        <CheckMenuItem text="MR Anburaj Civil" onAction="#handleSearch"/>-->
+<!--        <CheckMenuItem text="Dr Rajkumar" onAction="#handleSearch"/>-->
+<!--        <CheckMenuItem text="Amazon" onAction="#handleSearch"/>-->
+<!--        <CheckMenuItem text="Lakshmi Publication" onAction="#handleSearch"/>-->
+<!--        <CheckMenuItem text="Donations" onAction="#handleSearch"/>-->
 
+      </items>
 
+    </MenuButton>
+  </HBox>
 
-    <Button text="GenerateReport" onAction="#handleGenerateReport"/>
+  <!-- Show Statement Section -->
+  <MenuButton fx:id="statementButton" text="Show Statement">
+    <items>
+      <Menu fx:id="yearMenu" text="Year">
+        <items>
+          <MenuItem fx:id="allYears" text="All" onAction="#handleAllYearsSelection"/>
 
+          <Menu fx:id="year2023" text="2023">
+            <items>
+              <MenuItem fx:id="odd2023" text="ODD" onAction="#handleSemSelection"/>
+              <MenuItem fx:id="even2023" text="EVEN" onAction="#handleSemSelection"/>
+            </items>
+          </Menu>
+
+          <Menu fx:id="year2024" text="2024">
+            <items>
+              <MenuItem fx:id="odd2024" text="ODD" onAction="#handleSemSelection"/>
+              <MenuItem fx:id="even2024" text="EVEN" onAction="#handleSemSelection"/>
+            </items>
+          </Menu>
+        </items>
+      </Menu>
+
+      <MenuItem fx:id="purchasedOption" text="Purchased" onAction="#handlePurchaseSelection"/>
+      <MenuItem fx:id="donationOption" text="Donation" onAction="#handleDonationSelection"/>
+    </items>
+  </MenuButton>
+
+  <!-- Buttons for Report and Book List -->
+  <HBox spacing="10" alignment="CENTER">
+    <Button text="Generate Report" onAction="#handleGenerateReport"/>
     <Button text="List of Books (May - June 2024)" onAction="#openHtmlPage"/>
-
-
-
     <Button text="New" onAction="#openNewForm"/>
   </HBox>
 
@@ -98,4 +150,5 @@
       <TableColumn text="Net Amount" fx:id="netAmountColumn" prefWidth="120"/>
     </columns>
   </TableView>
+
 </VBox>
